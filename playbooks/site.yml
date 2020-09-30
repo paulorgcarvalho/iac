@@ -1,0 +1,43 @@
+- hosts: webservers
+  become: yes
+  tasks:
+    - name: Install do Apache no CentOS
+      yum:
+        name: httpd
+        state: latest
+
+    - name: Enable and Start
+      systemd: 
+        name: httpd
+        enabled: yes
+        state: started
+
+- hosts: dbservers
+  become: yes
+  tasks:
+    - name: Install MySQL Database
+      apt:
+        name: mysql-server
+        state: latest
+
+    - name: Enable and Start
+      systemd:
+        name: mysql
+        enabled: yes
+        state: started
+
+- hosts: all
+  become: yes
+  tasks:
+    - name: Ensure group "Infra" existis
+      group:
+        name: infra
+        state: present
+        gid: 12000
+
+    - name: Create admin user
+      user:
+        name: sysops
+        uid: 14000
+        groups: sudo,infra
+        shell: /bin/bash
